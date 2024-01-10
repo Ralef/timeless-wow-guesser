@@ -39,3 +39,5 @@ openapi.yml
 
 # test coverage
 coverage
+
+config.json
