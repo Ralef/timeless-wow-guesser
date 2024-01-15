@@ -11,8 +11,7 @@ datasource db {
 }
 
 model Challenger {
-  id        Int      @id @default(autoincrement())
-  userName  String
-  userId    Int      @unique
+  id        String   @id
+  name      String
   joinedAt  DateTime @default(now())
 }
