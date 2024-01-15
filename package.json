@@ -4,10 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "lint": "eslint . --ext .js",
+    "create-database": "touch prisma/dev.db && npx prisma migrate dev --name init --preview-feature",
+    "setup-files": "cp -n config.json.example config.json",
+    "setup": "npm install && npm run setup-files && npm run create-database",
+    "deploy-commands": "node deploy-commands.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.8.0",
     "discord.js": "^14.14.1"
