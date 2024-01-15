@@ -41,3 +41,7 @@ openapi.yml
 coverage
 
 config.json
+
+# sqlite db
+prisma/dev.db
+*.db-journal
