@@ -27,20 +27,26 @@ module.exports = {
     async execute(interaction) {
         let user = interaction.user;
         let userRecord = await getChallenger(user.id);
+        let clue = await prisma.Clue.findFirst();
 
-        if (userRecord) {
-            await interaction.reply('_You have already started the challenge!_ Check your DMs for the first clue. Good luck!');
+        if (!clue) {
+            await interaction.reply('There is active challenge in progress. If you think this is a mistake, contact the admins');
             return;
         }
 
-        let savedMessage = 'That is the message that contains a clue.';
-        let currentDate = new Date();
-        await interaction.user.send(savedMessage + ' Debug: date is ' + currentDate.toISOString() + ' and user is ' + user.tag)
+        if (userRecord) {
+            await interaction.reply('_You have already started the challenge!_\n' +
+                'I\'ll send you the first clue again. If you still have trouble, contact the admins.');
+        } else {
+            await interaction.reply('Welcome to the challenge! Check your DMs for the first clue. Good luck!');
+        }
+
+        await interaction.user.send(clue.content)
             .then(message => {
-                console.log(`Sent message: '${message.content}' to ${user.tag}`);
-                saveChallenger(user.id, user.tag);
+                if (!userRecord) {
+                    saveChallenger(user.id, user.tag);
+                }
             })
             .catch(console.error);
-        await interaction.reply('Welcome to the challenge! Check your DMs for the first clue. Good luck!');
     },
 };

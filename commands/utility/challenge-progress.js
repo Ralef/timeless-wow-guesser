@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { PrismaClient } = require('@prisma/client');
 const { AsciiTable3 } = require('ascii-table3');
+const _ = require("lodash");
+const moment = require('moment');
 
 
 const prisma = new PrismaClient();
@@ -11,10 +13,6 @@ async function getAllChallengers() {
             joinedAt: 'asc',
         },
     });
-}
-
-function getDateDifferenceInMinutesUTC(date1, date2) {
-    return Math.abs(date1 - date2) / 1000 / 60;
 }
 
 module.exports = {
@@ -29,16 +27,15 @@ module.exports = {
             asciiTable3.addRow(
                 challenger.id,
                 challenger.name,
-                getDateDifferenceInMinutesUTC((new Date()).getTime(), (new Date(challenger.joinedAt)).getTime()) + ' minutes',
-                new Date(challenger.joinedAt),
+                _.round(moment.duration(moment().diff(challenger.joinedAt)).asMinutes(), 2) + ' minutes',
+                moment(challenger.joinedAt).utc().format('YYYY-MM-DD HH:mm:ss'),
             );
         });
         let user = interaction.user;
-        await user.send('Here is the list of current participants and their progress on ' + new Date() + ':\n```\n' + asciiTable3.toString() + '\n```')
-            .then(message => {
-                console.log(`Sent message: '${message.content}' to ${user.tag}`);
-            })
+        await user.send('Here is the list of current participants and their progress on ' + new Date() + ':\n' +
+            '```\n' + asciiTable3.toString() + '\n```')
             .catch(console.error);
-        await interaction.reply('');
+        await interaction.reply({ content: 'List is sent to your DMs.', ephemeral: true })
+            .catch(console.error);
     },
 };
