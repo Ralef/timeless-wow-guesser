@@ -14,7 +14,7 @@ module.exports = {
         await prisma.Challenger.deleteMany();
         await prisma.Clue.deleteMany();
 
-        await interaction.reply('Challenge, clue, all participants and their progress are removed!')
+        await interaction.reply({ content: 'Challenge, clue, all participants and their progress are removed!', ephemeral: true })
             .catch(console.error);
     },
 };
