@@ -8,6 +8,9 @@ async function saveClue(content) {
         throw new Error('There is already a clue saved.');
     }
 
+    // Replace the string "\n" with the newline character
+    content = content.replace(/\\n/g, '\n');
+
     return await prisma.Clue.create({
         data: {
             content: content,

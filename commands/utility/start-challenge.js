@@ -30,7 +30,7 @@ module.exports = {
         let clue = await prisma.Clue.findFirst();
 
         if (!clue) {
-            await interaction.reply('There is active challenge in progress. If you think this is a mistake, contact the admins');
+            await interaction.reply('There is *NO* active challenge in progress. If you think this is a mistake, contact the admins');
             return;
         }
 
