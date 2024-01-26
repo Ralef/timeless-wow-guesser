@@ -3,50 +3,26 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-async function getChallenger(id) {
-    return await prisma.Challenger.findUnique({
-        where: {
-            id: id,
-        },
-    });
-}
-
-async function saveChallenger(id, name) {
-    return await prisma.Challenger.create({
-        data: {
-            id: id,
-            name: name,
-        },
-    });
-}
-
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('start-challenge')
-        .setDescription('It will start timer and give you first clue for the challenge.'),
+    .setName('start-challenge')
+    .setDescription('Starts timer and gives the first clue for the challenge.'),
     async execute(interaction) {
-        let user = interaction.user;
-        let userRecord = await getChallenger(user.id);
-        let clue = await prisma.Clue.findFirst();
+        const user = interaction.user;
+        const userRecord = await prisma.Challenger.findUnique({ where: { id: user.id } });
+        const clue = await prisma.Clue.findFirst();
 
         if (!clue) {
-            await interaction.reply('There is *NO* active challenge in progress. If you think this is a mistake, contact the admins');
-            return;
+            return interaction.reply('No active challenge. Contact admins if this is a mistake.');
         }
 
         if (userRecord) {
-            await interaction.reply('_You have already started the challenge!_\n' +
-                'I\'ll send you the first clue again. If you still have trouble, contact the admins.');
+            interaction.reply('You have already started the challenge! Check your DMs for the first clue again.');
         } else {
-            await interaction.reply('Welcome to the challenge! Check your DMs for the first clue. Good luck!');
+            interaction.reply('Welcome to the challenge! Check your DMs for the first clue. Good luck!');
+            prisma.Challenger.create({ data: { id: user.id, name: user.tag } });
         }
 
-        await interaction.user.send(clue.content)
-            .then(message => {
-                if (!userRecord) {
-                    saveChallenger(user.id, user.tag);
-                }
-            })
-            .catch(console.error);
+        interaction.user.send(clue.content).catch(console.error);
     },
 };
